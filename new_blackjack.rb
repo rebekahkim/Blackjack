@@ -223,6 +223,12 @@ until command == 'e'
 			games.each do |game|
 			  puts "#{game['id']}:  #{game['name']}"
 			end
+
+			puts
+			puts "Enter ID of the game to load: "
+			loading_game = gets.to_i
+			
+
 		when 's'
 			puts "Type the name of a particular game you'd like to see:"
 			game_name = gets.strip 	#OOPS I'M NOT ESCAPING THIS - BAD NEWS
