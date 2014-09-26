@@ -26,7 +26,7 @@ class Card 		# Keeps tract of a single card
 		elsif @face == 'A'
 			value = 11
 		else
-			value = @face.to_i
+			value = @face
 		end
 	end
 
