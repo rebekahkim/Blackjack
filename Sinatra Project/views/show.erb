@@ -1,0 +1,50 @@
+<!-- show.erb -->
+
+
+
+<html lang="en">
+  <head>
+    <title> <%= @game.name %>'s Blackjack </title>
+    <meta charset="utf-8">
+
+    <style>
+    	p{
+    		color: black;
+    		font-family: Times;
+    		font-size: 16px;
+    	}
+
+    	#important_p {
+    		color: goldenrod;
+    		font-size: .8em;
+    	}
+    </style>
+  </head>
+  <body>
+ 
+    <h1 style="color:blue"> <strong><%= @game.name %>'s Blackjack </h1></strong>
+    <p> Game ID: <%= @game.id %> </p>
+	<p> Game name: <%= @game.name %> </p>
+	<p> Money in the bank: $ <%= @game.money %> </p>
+
+	<h3 style = "color:crimson;">Player Hand:</h3>
+
+	<ul>
+		<% @game.user_hand.each do |card| %>
+			<float> 
+
+				<img src="/<%=card.file_name %>">  
+
+				
+			</float>
+		<% end %>
+	</ul>
+
+<!--     <p>
+      Pixels are <span style="color:red;">red</span><br>
+      Pixels are <span style="color:blue;">blue</span><br>
+      This is <strong>text<i style="font-size:30px;">HTML</i></strong><br>
+    </p>
+ -->
+    </body>
+    </html>

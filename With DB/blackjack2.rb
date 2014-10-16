@@ -6,8 +6,8 @@
 # - Add Split, Double, Insurance Features
 #Blackjack Game
 
-require_relative 'game_new'
-require_relative 'card'
+require_relative 'game_new2'
+require_relative 'card2'
 
 require 'mysql2'
 mysql = Mysql2::Client.new(host: '127.0.0.1', username: 'root', database: 'blackjack')

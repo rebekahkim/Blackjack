@@ -3,7 +3,7 @@
 # Working with MySQL database managing
 
 require 'mysql2'
-require_relative 'card'
+require_relative 'card2'
 
 class Game
 	def initialize(id)
@@ -14,27 +14,46 @@ class Game
 		# pull cards from db
 		@shuffled_deck = []
 
-		@mysql.query("SELECT * FROM game_cards WHERE game_id = #{@id}").each{|row|
+		@mysql.query("SELECT * FROM game_cards WHERE game_id = #{@id} AND pile = 'shuffled_deck'").each{|row|
 			@shuffled_deck << Card.new(row['suit'], row['face'])
+			# puts @shuffled_deck
 		}
+
 		#if no cards, create default deck
 		if @shuffled_deck.empty?
 			@shuffled_deck = Card.deck.shuffle
-			@shuffled_deck.each{|card|
-				puts card.display
-			}
+			# @shuffled_deck.each{|card|
+			# 	puts card.display
+			# }
 		end
+
+		# puts @shuffled_deck
 
 		@user_hand = []
 		@dealer_hand = []
 
-		2.times do
-			@user_hand << @shuffled_deck.pop
-			@dealer_hand << @shuffled_deck.pop
+		# get cards from previous game play, if it exists
+
+		@mysql.query("SELECT * FROM game_cards WHERE game_id = #{@id} AND pile = 'dealer_hand'").each{|row|
+			@dealer_hand << Card.new(row['suit'], row['face'])			 
+		}
+
+		@mysql.query("SELECT * FROM game_cards WHERE game_id = #{@id} AND pile = 'user_hand'").each{|row|
+			@user_hand << Card.new(row['suit'], row['face'])			
+		}
+
+
+		# for new games, user hand and dealer hands should be empty, so pop in cards from the shuffled deck
+		if @user_hand.empty?
+			2.times do
+				@user_hand << @shuffled_deck.pop
+				@dealer_hand << @shuffled_deck.pop
+			end
 		end
 
 		# puts @mysql.query("SELECT * FROM games WHERE id = #{@id}").to_a
-		@user_money = @mysql.query("SELECT * FROM games WHERE id = #{@id}").first['money']	#INSERT is adding row, which is fast unlike columns
+		@user_money = @mysql.query("SELECT * FROM games WHERE id = #{@id}").first['money']	
+		#INSERT is adding row, which is fast, unlike adding columns (because it affects all rows)
 
 	end
 
@@ -84,22 +103,34 @@ class Game
 		@user_hand.clear
 		@dealer_hand.clear
 
-		puts "Would you like to (s)ave? Press any other key to not save."
-		save = gets.chomp
-		if save == 's'
-			@mysql.query "UPDATE games SET money = #{@user_money} WHERE id = #{@id}"
-
-			@mysql.query "DELETE FROM game_cards WHERE game_id = #{@id}"
-			@shuffled_deck.each{|card|
-				@mysql.query "INSERT INTO game_cards(face, suit, game_id)
-					VALUES('#{card.face}', '#{card.suit}', #{@id} )"
-			}
-		end
 
 		2.times do
 			@user_hand << @shuffled_deck.pop
 			@dealer_hand << @shuffled_deck.pop
 		end
+
+		self.save
+
+	end
+
+	def save
+		@mysql.query "UPDATE games SET money = #{@user_money} WHERE id = #{@id}"
+
+		@mysql.query "DELETE FROM game_cards WHERE game_id = #{@id}"
+		
+		@user_hand.each{|card|
+				@mysql.query "INSERT INTO game_cards(face, suit, game_id, pile)
+					VALUES('#{card.face}', '#{card.suit}', #{@id}, 'user_hand')"
+			}
+		
+		@dealer_hand.each{|card|
+				@mysql.query "INSERT INTO game_cards(face, suit, game_id, pile)
+					VALUES('#{card.face}', '#{card.suit}', #{@id}, 'dealer_hand')"
+			}
+		@shuffled_deck.each{|card|
+				@mysql.query "INSERT INTO game_cards(face, suit, game_id, pile)
+					VALUES('#{card.face}', '#{card.suit}', #{@id}, 'shuffled_deck')"
+			}
 	end
 
 	def blackjack_draw?
@@ -141,6 +172,7 @@ class Game
 	def user_sum
 		@user_sum = 0
 		@user_hand.each{|card|
+			# puts card.inspect
 			@user_sum += card.value
 		}
 		
@@ -249,12 +281,13 @@ class Game
 			|        ______________________________        |
 			|       /     +         +        +     \\       |
 			|______ ********************************_______|
-			        ********************************         
-			        ||||                         |||
-			        ||                            ||
-			        ||                            ||"
+				********************************         
+				||||                         |||
+				||                            ||
+				||                            ||"
 
 				if self.valid_bet?(bet)
+					self.save
 					puts
 					puts "Your hand: "
 					 "#{self.display}"
@@ -283,6 +316,8 @@ class Game
 								print "(h)it or (st)and?: "
 								move = gets.chomp
 
+								self.save
+								
 								case move
 									when 'h'
 										puts '-----------'
@@ -291,9 +326,9 @@ class Game
 										puts
 										self.hit_user
 										self.user_sum
-					 					puts
+										puts
 										if self.bust?
-					 						puts
+											puts
 											puts "BUST"
 											puts
 											self.bet_lose(bet)
@@ -306,9 +341,6 @@ class Game
 											puts
 											puts "Dealer's card: #{self.display_dealer}"
 											puts
-											if self.dealer_sum < 17
-												self.hit_dealer
-											end
 										end											
 
 									when 'st'
@@ -320,6 +352,7 @@ class Game
 											self.hit_dealer
 										end
 
+										self.save
 										self.user_sum
 										self.dealer_sum
 
