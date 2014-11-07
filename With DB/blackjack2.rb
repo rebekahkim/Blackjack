@@ -66,13 +66,14 @@ until command == 'e'
 
 			mysql.query "INSERT INTO games (name, money) VALUES ('#{save_name}', 100)"
 			
+			puts
 			id = mysql.query("SELECT LAST_INSERT_ID() AS id").first['id']
-			puts id
 
 			puts "Game created!"
 
 			puts "______________________________________________"
 			puts "#{save_name}'s Blackjack Game"
+			puts "Your ID: #{id}"
 			puts
 			puts 'Get up to $1000 to win the game'
 			puts

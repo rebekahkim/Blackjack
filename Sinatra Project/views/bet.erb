@@ -1,0 +1,19 @@
+<html lang="en">
+	<head>
+    	<title>Place you bet</title>
+    	<meta charset="utf-8">
+	</head>
+
+	<body>
+		Your bet:
+
+		<div style="float:center; padding:10px; width:200px; background-color:#eee; border-radius:5px; border: 1px blue; margin-right:5px;">
+			<form name="input" action="/games/<%= @game.id %>/place_bet" method="post">
+				<input type="number" name="bet">
+				<input type="submit" value="Bet!">
+			</form>
+ 		</div>
+
+
+	</body>
+</html>

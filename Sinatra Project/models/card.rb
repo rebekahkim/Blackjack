@@ -88,7 +88,7 @@ class Card 		# Keeps tract of a single card
 	end
 
 	def file_name
-		"#{@suit.chars.first}_#{@face}"
+		"#{@suit.chars.first.downcase}_#{@face}.png"
 	end
 
 end

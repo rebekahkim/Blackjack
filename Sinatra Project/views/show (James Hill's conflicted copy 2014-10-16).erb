@@ -1,6 +1,5 @@
 <!-- show.erb -->
-
-
+<!DOCTYPE html>
 
 <html lang="en">
   <head>
@@ -27,24 +26,20 @@
 	<p> Game name: <%= @game.name %> </p>
 	<p> Money in the bank: $ <%= @game.money %> </p>
 
-	<h3 style = "color:crimson;">Player Hand:</h3>
+	<h2 style = "color:crimson;">User Hand:</h2>
 
+    <strong>Number of cards: <%= @game.user_hand.count %></strong>
 	<ul>
 		<% @game.user_hand.each do |card| %>
 			<float> 
 
-				<img src="/<%=card.file_name %>">  
+				<img src="/<%=card.file_name %> ">  
 
 				
 			</float>
 		<% end %>
 	</ul>
 
-<!--     <p>
-      Pixels are <span style="color:red;">red</span><br>
-      Pixels are <span style="color:blue;">blue</span><br>
-      This is <strong>text<i style="font-size:30px;">HTML</i></strong><br>
-    </p>
- -->
+
     </body>
     </html>
