@@ -1,0 +1,106 @@
+<!-- show.erb -->
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <title> <%= @game.name %>'s Blackjack </title>
+    <meta charset="utf-8">
+
+    <style>
+    	p{
+    		color: black;
+    		font-family: Times;
+    		font-size: 16px;
+    	}
+
+    	#important_p {
+    		color: goldenrod;
+    		font-size: .8em;
+    	}
+    </style>
+  </head>
+  <body>
+ 
+    <h1 style="color:gold"> <strong><%= @game.name %>'s Blackjack </h1></strong>
+    <p> Game ID: <%= @game.id %> </p>
+	<p> Game name: <%= @game.name %> </p>
+	<p> Money in the bank: $ <%= @game.money %> </p>
+
+	<h2 style = "color:crimson;">User Hand:</h2>
+
+
+  <ul>
+		<% @game.user_hand.each do |card| %>
+			<float> 
+
+				<img src="/<%=card.file_name%>">  
+				
+			</float>
+		<% end %>
+	</ul>
+  <h3> Card Sum: <%= @game.user_sum.inspect %> </h3>
+
+<!-- <strong>Sum: <%= @game.user_hand.count %></strong> -->
+
+
+  <h2 style = "color:blue;">Dealer Hand:</h2>
+
+  
+  <% if @game.status == 'round_in_progress' or @game.status == 'new_round' %>
+    <ul>
+        <float> 
+      
+        <img src="/<%=@game.dealer_hand.first.file_name%>">   
+
+        </float>
+    </ul>
+
+    <a href="/games/<%=@game.id%>/hit" style="color: green; font-size: 32px">Hit </a>
+    &nbsp;     &nbsp;     &nbsp;
+    <a href="/games/<%=@game.id%>/stand" style="color: green; font-size: 32px"> Stand </a>
+    
+   <% else %>
+      <% @game.dealer_hand.each do |card| %>
+      <float> 
+
+        <img src="/<%=card.file_name%>">  
+        
+      </float>
+      <% end %>
+      <h3> Dealer Sum: <%= @game.dealer_sum.inspect %> </h3> 
+
+      <% case @game.status 
+
+         when 'round_blackjack' %>
+
+            <h1 style = "color:crimson;"> BLACKJACK! You won! </h1>
+
+         <% when 'round_won' %>
+            <h1 style = "color:crimson;"> You won! </h1>
+
+         <% when 'round_draw' %>
+            <h1 style = "color:crimson;"> PUSH: it's a draw </h1>
+
+         <% when 'round_lost' %>
+            <h1 style = "color:crimson;"> You lost </h1>
+      <% end %>
+
+      <float> 
+      <a href="/games/<%=@game.id%>/new_round" style="color: cadetblue; font-size: 32px"> <strong> New Round </strong> </a>
+      </float>
+
+
+
+   <% end %>
+
+
+
+    </body>
+    </html>
+
+
+
+
+
+
+
