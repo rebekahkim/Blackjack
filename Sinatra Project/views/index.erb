@@ -1,52 +1,32 @@
 
 <html lang="en">
-  <head>
-    <title>Play Blackjack!</title>
-    <meta charset="utf-8">
+ 
+<body>
 
-    <style>
-    	p{
-    		color: black;
-    		font-family: Arial;
-    		font-size: 16px;
-    	}
+<div style="float:center; padding:10px; width:200px; background-color:#eee; border-radius:5px; border: 1px blue; margin-right:5px;">
+    <center>
+      <img src="http://www.drevancollins.com/images/small-play-button.png">
+      <a href="/games/new"> Start a New Game </a>
+    </center>
+</div>
 
-    	#important_p {
-    		color: goldenrod;
-    		font-size: 12 em;
-    	}
-    </style>
-  </head>
 
-    <h1 style="color:blue"> <strong>Blackjack</h1></strong>
-    <p>
-      <span style="color:red;"><strong>Welcom to the Blackjack Game Page</strong></span><br>
-     <!--  Pixels are <span style="color:blue;">blue</span><br>
-      This is <strong>text<i style="font-size:30px;">HTML</i></strong><br>
-      And well-formed <span style="font-size:1.1em;">woohoo!</span>
- -->    </p>
-
-    <img src="http://casinoallbonus.com/images/blackjack-21.gif">
-
-    <br>
-    <br>
-    <br>
-
-  <div style="float:center; padding:10px; width:200px; background-color:#eee; border-radius:5px; border: 1px blue; margin-right:5px;">
-    <img src="http://www.drevancollins.com/images/small-play-button.png">
-    <a href="/games/new"> Start a New Game </a>
-  </div>
-
-  <body>
 
   <p><strong>Listing all games... </strong></p>
-  <% @game.each do |game| %>
-    <p id="important_p">
-      <%=  game.id %>
-      : 
-      <%= game.name %>
-    </p>
-  <% end %>
+
+  <ul>
+    <% @game.each do |game| %>
+      <li> 
+      <p id="important_p">
+        <%=  game.id %>
+        :
+        <a href="/games/<%= game.id %>"> 
+          <%= game.name %>
+        </a>
+      </p>
+      </li>
+    <% end %>
+  </ul>
 
 
 <br>

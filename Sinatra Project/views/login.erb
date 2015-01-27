@@ -1,0 +1,19 @@
+
+<!-- Login -->
+
+<h3 style = "color:red;">Login</h3>
+
+<form name="input" action="/login" method="post">
+	User ID: <input type="text" name="user_id" >
+	<br>
+	<br>
+	Password: <input type="text" name="password" >
+	<input type="submit" value="Login">
+</form>
+
+<% if @duplicate_message %>
+ 			<h1 style="color:red"> <strong> Sorry! The User ID already exists. Please try another name.</strong></h1>
+<% end %>
+
+
+<a href="/"> Return to Homepage </a>

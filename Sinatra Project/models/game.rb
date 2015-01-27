@@ -22,6 +22,19 @@ class Game
 		game_objs
 	end
 
+	def self.all_for_user(user_id)
+		mysql = Mysql2::Client.new(host: '127.0.0.1', username: 'root', database: 'blackjack')
+
+		games = mysql.query "SELECT * FROM games WHERE user_id = '#{user_id}"
+		game_objs =[]
+
+		games.each do |game|
+			game_objs << Game.new(game['id']) #, game['name'], game['money'])
+		end
+
+		game_objs
+	end
+
 	# Find method: new data tables (pile- user hand, dealer hand, etc) from mysql
 
 
@@ -224,11 +237,34 @@ class Game
 		save 	# so why can you just say 'save' instead of 'self.save???'
 	end
 
+	def check_bet(bet)
+		valid_bet = nil
+
+		check = bet.to_i
+
+		if check > 0
+			if check > @money
+				valid_bet = false
+			else
+				valid_bet = true
+			end
+		else
+			valid_bet = false
+		end
+
+		return valid_bet
+	end
+
 	def place_bet(bet)
 		mysql = Mysql2::Client.new(host: '127.0.0.1', username: 'root', database: 'blackjack')
 
-		@bet = bet
-		mysql.query "UPDATE games SET bet = #{@bet} WHERE id = #{@id}"
+		if check_bet(bet)
+			@bet = bet.to_i
+			mysql.query "UPDATE games SET bet = #{@bet} WHERE id = #{@id}"
+			true
+		else
+			false
+		end
 		# puts query		
 		# mysql.query query
 	end

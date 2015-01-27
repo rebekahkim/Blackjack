@@ -1,17 +1,9 @@
 # IN PROGRESS
 # Sinatra & Blackjack
 
-# links working on the index page
 # display basic information about the chosen game on another page 
-# (using the game data you already have in your databases - don’t worry about creating new games at this point).
-# Bonus points for showing images of the current game's cards (served from your public folder).
-
-# add link to index page
-# create new page for new game
-# HTML A tag
 
 # Read HTML Form
-
 
 		# <% game_name = gets.strip 
 		# save_name = mysql.escape(game_name)
@@ -22,10 +14,12 @@
 
 
 require 'mysql2'
-
+# enable :sessions
 require 'sinatra'
 require_relative "models/game.rb"
 require_relative "models/card.rb"
+require_relative "models/user.rb"
+
 
 # Add a sum method to the Array class
 # class Array
@@ -44,15 +38,73 @@ get '/hi' do
 end
 
 get '/' do
-	@game = Game.all
-	erb :index
+	if ! session[:user_id]
+		erb :home
+	else
+		@games = Game.all_for_user(session[:user_id])
+		erb :index
+	end
 end
+
+def authenticate
+	game = Game.new(params[:game_id])
+	if session[:user_id] != game.id
+		redirect '/'
+	end
+
+	# use LoginScreen
+
+	before do
+		unless session[:user_id]
+			halt "Access denied, please <a href='/login'>login</a>."
+		end
+	end
+
+	get('/') { "Hello #{session['user_id']}." }
+end
+
+
+before '/games/:game_id' do
+	if params[:game_id].is_a? Integer
+		authenticate
+	end
+end
+
+before '/games/:game_id/*' do
+  authenticate
+end
+
+post '/login' do
+	user = User.find(params[:user_id], params[:password])
+	if user
+		session[:user_id] = user.id
+		redirect "/"
+	else
+		erb :login
+	end
+end
+
+get '/register' do
+	erb :register
+end
+
+post '/new_user'do
+	user = User.new_user(params[:user_id], params[:password])
+
+	if user.duplicate == true
+		@duplicate_message = true
+		erb :login
+	else
+		redirect '/'
+	end
+end
+
 
 get '/games/new' do 			# catch before inserting ID
 	erb :new
 end
 	
-post '/games/create' do
+post '/games/create' do 									# DONT ALLOW SQL INJECTION!!!
 	@game = Game.create(params[:user])
 	redirect "/games/#{@game.id}"
 end
@@ -88,11 +140,19 @@ get '/games/:game_id/bet' do 			# "post" means getting info from the user
 	erb :bet
 end
 
+# get '/betting_error' do
+# 	erb :error
+# end
+
 post '/games/:game_id/place_bet' do
 	@game = Game.new(params[:game_id])
-	@game.place_bet(params[:bet])
+	if @game.place_bet(params[:bet])
+		redirect "/games/#{@game.id}"
+	else
+		@error_message = true
+		erb :bet
+	end	
 	# erb :debug
-	redirect "/games/#{@game.id}"
 end
 
 
